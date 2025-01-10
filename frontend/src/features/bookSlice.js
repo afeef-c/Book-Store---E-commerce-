@@ -3,10 +3,20 @@ import api from '../services/api';
 
 
 
-export const fetchBooks = createAsyncThunk('books/fetchCourses', async () => {
+export const fetchBooks = createAsyncThunk('books/fetchBookList', async () => {
     const response = await api.get('api/books/');
     return response.data;
 });
+
+export const fetchBookDetails = createAsyncThunk('books/fetchBook', async (bookId, { rejectWithValue }) => {
+    try {
+        const response = await api.get(`api/books/book_details/${bookId}/`);
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response ? error.response.data : error.message);
+    }
+});
+
 
 export const fetchGenre = createAsyncThunk('books/fetchGenere', async () => {
     const response = await api.get('api/books/genre/');
@@ -16,11 +26,14 @@ export const fetchGenre = createAsyncThunk('books/fetchGenere', async () => {
 // Initial state
 const initialState= {
         book_list: [],
+        bookDetails:null,
         genre: [],
         status: 'idle',
         gen_status:'idle',
+        details_status:'idle',
         error: null,
         gen_error:null,
+        details_error:null
         
     };
 
@@ -53,6 +66,19 @@ const bookSlice = createSlice({
             .addCase(fetchGenre.rejected, (state, action) => {
                 state.gen_status = 'failed';
                 state.gen_error = action.error.message;
+            })
+            
+            
+            .addCase(fetchBookDetails.pending, (state) => {
+                state.details_status = 'loading';
+            })
+            .addCase(fetchBookDetails.fulfilled, (state, action) => {
+                state.details_status = 'succeeded';
+                state.bookDetails = action.payload;
+            })
+            .addCase(fetchBookDetails.rejected, (state, action) => {
+                state.details_status = 'failed';
+                state.details_error = action.error.message;
             });
     },
 })

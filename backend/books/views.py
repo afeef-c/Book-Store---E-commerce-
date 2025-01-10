@@ -4,6 +4,8 @@ from rest_framework import status
 from .models import Book,Genre
 from .serializers import BookSerializer,BookGenreSerializer
 from rest_framework import generics, permissions
+import logging
+logger = logging.getLogger(__name__)
 
 
 
@@ -57,7 +59,9 @@ class BookDetailView(APIView):
         serializer = BookSerializer(book)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
     def put(self, request, pk):
+        logger.debug(f"Request data: {request.data}")
         book = self.get_object(pk)
         if not book:
             return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -65,7 +69,10 @@ class BookDetailView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.debug(f"Serializer errors: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
     def delete(self, request, pk):
         book = self.get_object(pk)
@@ -73,3 +80,5 @@ class BookDetailView(APIView):
             return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
         book.delete()
         return Response({'message': 'Book deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+

@@ -28,7 +28,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'password','is_staff']
+        fields = ['username','id', 'password','is_staff']
 
 
 class OrderItemSerializer(serializers.ModelSerializer):

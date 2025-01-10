@@ -17,7 +17,7 @@ from books.models import Book
 from .serializers import CartSerializer, CartItemSerializer,OrderSerializer,PreferenceSerializer,CustomUserSerializer
 from rest_framework import generics, permissions,status
 
-
+ 
 
 
 class UserRegistrationView(APIView):
@@ -85,6 +85,7 @@ class CartView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+
 class CartItemDeleteView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -146,15 +147,24 @@ class OrderView(APIView):
 
 
 class PreferenceView(APIView):
-    
     """
-    Handles creating and updating user preferences for books.
+    Handles creating, updating, and toggling user preferences for books.
     """
-    
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        preferences = Preference.objects.filter(user=request.user)
+        book_id = request.query_params.get('book')  # Fetch book ID from query parameters
+        if book_id:
+            # preferences = Preference.objects.filter(user=request.user, book_id=book_id)
+            preference = Preference.objects.get(user=request.user, book_id=book_id)
+            data = {
+                'book_id': preference.book.id,
+                'preference': preference.preference,
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            preferences = Preference.objects.filter(user=request.user)
+
         serializer = PreferenceSerializer(preferences, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -173,25 +183,18 @@ class PreferenceView(APIView):
         except Book.DoesNotExist:
             return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Create or update the preference
-        preference, created = Preference.objects.update_or_create(
-            user=request.user,
-            book=book,
-            defaults={'preference': preference_value}
-        )
+        # Check if the preference already exists
+        preference, created = Preference.objects.get_or_create(user=request.user, book=book_id)
+
+        if preference.preference == preference_value:
+            # If the current preference matches the request, toggle it to `None`
+            preference.preference = None
+        else:
+            # Otherwise, update it to the new preference
+            preference.preference = preference_value
+
+        preference.save()
 
         serializer = PreferenceSerializer(preference)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def delete(self, request):
-        book_id = request.data.get('book')
-        if not book_id:
-            return Response({'error': 'Book ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            preference = Preference.objects.get(user=request.user, book_id=book_id)
-            preference.delete()
-            return Response({'message': 'Preference deleted'}, status=status.HTTP_204_NO_CONTENT)
-        except Preference.DoesNotExist:
-            return Response({'error': 'Preference not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.data, status=status.HTTP_200_OK if not created else status.HTTP_201_CREATED)
 

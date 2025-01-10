@@ -13,17 +13,20 @@ class BookGenreSerializer(serializers.ModelSerializer):
 
 
 class BookSerializer(serializers.ModelSerializer):
+    genre = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all())  # Make genre accept IDs
+
     class Meta:
         model = Book
         fields = '__all__'
 
-    def update(self, instance, validated_data):
-        request = self.context.get('request')
-        user = request.user
+    # def update(self, instance, validated_data):
+    #     request = self.context.get('request')
+    #     user = request.user
 
-        # If the user is not an admin, prevent updating the 'is_active' field
-        if not user.is_staff and 'is_active' in validated_data:
-            validated_data.pop('is_active')  # Remove the 'is_active' field from update
+    #     # If the user is not an admin, prevent updating the 'is_active' field
+    #     if not user.is_staff and 'is_active' in validated_data:
+    #         validated_data.pop('is_active')  # Remove the 'is_active' field from update
 
-        # Proceed with the standard update
-        return super().update(instance, validated_data)
+    #     # Proceed with the standard update
+    #     return super().update(instance, validated_data)
+

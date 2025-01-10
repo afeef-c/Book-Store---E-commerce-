@@ -8,6 +8,7 @@ import Navbar from './components/Navbar';
 import BookList from './components/BookList';
 import AddBook from './components/AddBook';
 import AddGenre from './components/AddGenre';
+import BookDetails from './pages/BookDetails';
 
 
 function App() {
@@ -22,7 +23,10 @@ function App() {
         <Route path='/login' element={ <Login/> } />
         <Route path='/register' element={ <Register/> } />
         <Route path='/book_list' element={ <BookList/> } />
+        <Route path="/book_details/:bookId" element={<BookDetails />} />
         <Route path='/add_book' element={ <AddBook/> } />
+        <Route path="/edit_book/:bookId" element={<AddBook />} />
+
         <Route path='/add_genre' element={ <AddGenre/> } />
         
 

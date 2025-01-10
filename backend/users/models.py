@@ -48,16 +48,12 @@ class CartItem(models.Model):
 
 
 
-
 class Order(models.Model):
     STATUS_CHOICES = (
         ('pending','Pending'),
-        ('confirmed','Confirmed'),
+        ('placed','Placed'),
         ('shipped','Shipped'),
-        ('cancelled','Cancelled'),
-        ('completed','Completed'),
-        ('delivered','Delivered'),
-        ('return','Returned')
+        ('delivered','Delivered')
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.TextField()

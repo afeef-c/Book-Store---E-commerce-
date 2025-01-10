@@ -15,6 +15,7 @@ urlpatterns = [
     path('orders/', OrderView.as_view(), name='orders'),
 
     path('preferences/', PreferenceView.as_view(), name='preferences'),
+    # path('current_preferences/<int:item_id>', PreferenceView.as_view(), name='preferences'),
 
 
 ]
