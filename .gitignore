@@ -1,0 +1,24 @@
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+media/
+
+# Environments
+newenv/
+env/
+.venv/
+*.env
+
+# React/Node
+node_modules/
+build/
+public/
+
+# VS Code
+.vscode/
+
+
+# Windows
+Thumbs.db

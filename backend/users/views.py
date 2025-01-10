@@ -1,0 +1,197 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import UserRegistrationSerializer
+from django.contrib.auth import authenticate
+from rest_framework.permissions import IsAuthenticated
+from .models import Order,OrderItem,Cart,CartItem
+from books.models import Book
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Cart, CartItem,Order, OrderItem,Preference
+from books.models import Book
+from .serializers import CartSerializer, CartItemSerializer,OrderSerializer,PreferenceSerializer,CustomUserSerializer
+from rest_framework import generics, permissions,status
+
+
+
+
+class UserRegistrationView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({'message': 'User registered successfully.'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ObtainTokenView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+        if user:
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }, status=status.HTTP_200_OK)
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class CurrentUserView(generics.RetrieveUpdateAPIView):
+    serializer_class = CustomUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_object(self):
+        return self.request.user
+
+
+class CartView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        serializer = CartSerializer(cart)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        book_id = request.data.get('book')
+        quantity = request.data.get('quantity', 1)
+
+        try:
+            book = Book.objects.get(id=book_id)
+        except Book.DoesNotExist:
+            return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, book=book, defaults={'quantity': quantity, 'price_at_addition': book.price})
+
+        if not created:
+            cart_item.quantity += int(quantity)
+            cart_item.save()
+
+        # Recalculate total price
+        cart.total_price = sum(item.sub_total() for item in cart.items.all())
+        cart.save()
+
+        serializer = CartSerializer(cart)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class CartItemDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, item_id):
+        try:
+            cart_item = CartItem.objects.get(id=item_id, cart__user=request.user)
+            cart_item.delete()
+            # Update cart total price
+            cart = Cart.objects.get(user=request.user)
+            cart.total_price = sum(item.sub_total() for item in cart.items.all())
+            cart.save()
+            return Response({'message': 'Item removed from cart'}, status=status.HTTP_204_NO_CONTENT)
+        except CartItem.DoesNotExist:
+            return Response({'error': 'Item not found in cart'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class OrderView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        orders = Order.objects.filter(user=request.user)
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        
+        # Create an order from the cart
+        cart = Cart.objects.filter(user=request.user).first()
+        if not cart or not cart.items.exists():
+            return Response({'error': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
+
+        address = request.data.get('address')
+        phone_number = request.data.get('phone_number')
+        payment_method = request.data.get('payment_method', 'COD')
+
+        if not address or not phone_number:
+            return Response({'error': 'Address and phone number are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create the order
+        order = Order.objects.create(user=request.user, address=address, phone_number=phone_number, payment_method=payment_method)
+
+        # Move cart items to order items
+        for item in cart.items.all():
+            OrderItem.objects.create(
+                order=order,
+                user=request.user,
+                book=item.book,
+                quantity=item.quantity,
+                book_price=item.book.price,
+            )
+
+        # Clear the cart
+        cart.items.all().delete()
+        cart.total_price = 0
+        cart.save()
+
+        serializer = OrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class PreferenceView(APIView):
+    
+    """
+    Handles creating and updating user preferences for books.
+    """
+    
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        preferences = Preference.objects.filter(user=request.user)
+        serializer = PreferenceSerializer(preferences, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        book_id = request.data.get('book')
+        preference_value = request.data.get('preference')
+
+        if not book_id or not preference_value:
+            return Response({'error': 'Book and preference are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if preference_value not in ['like', 'dislike']:
+            return Response({'error': 'Invalid preference value'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            book = Book.objects.get(id=book_id)
+        except Book.DoesNotExist:
+            return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Create or update the preference
+        preference, created = Preference.objects.update_or_create(
+            user=request.user,
+            book=book,
+            defaults={'preference': preference_value}
+        )
+
+        serializer = PreferenceSerializer(preference)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request):
+        book_id = request.data.get('book')
+        if not book_id:
+            return Response({'error': 'Book ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            preference = Preference.objects.get(user=request.user, book_id=book_id)
+            preference.delete()
+            return Response({'message': 'Preference deleted'}, status=status.HTTP_204_NO_CONTENT)
+        except Preference.DoesNotExist:
+            return Response({'error': 'Preference not found'}, status=status.HTTP_404_NOT_FOUND)
+
