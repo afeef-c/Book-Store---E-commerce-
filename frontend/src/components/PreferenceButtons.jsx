@@ -46,6 +46,7 @@ const PreferenceButtons = ({ bookId }) => {
     // Handle like or dislike action
     const handlePreference = (preference) => {
         // const newPreference = currentPreference?.preference === preference ? null : preference;
+        console.log("preference:",userId, bookId, preference)
         dispatch(updatePreference({ userId, bookId, preference: preference }));
     };
     console.log("currentPreference: ",currentPreference)

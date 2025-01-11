@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { addCartItem, fetchPreferences } from '../features/ecommerceSlice';
+import { addCartItem, fetchCart, fetchPreferences } from '../features/ecommerceSlice';
 import { fetchBookDetails, fetchBooks, fetchGenre } from '../features/bookSlice';
 import PreferenceButtons from '../components/PreferenceButtons';
 
@@ -31,7 +31,9 @@ function BookDetails() {
     };
 
     const addToCart = ()=>{
-        dispatch(addCartItem(bookDetails.id, quantity))
+        console.log("bookDetails.id, quantity",bookDetails.id, quantity)
+        dispatch(addCartItem({bookId:bookDetails.id, quantity}))
+        // dispatch(fetchCart(user.username))
     }
 
     // Fetch data on initial render
@@ -56,6 +58,7 @@ function BookDetails() {
         }
     }, [user]);
 
+    
     // Fetch user preferences if the user is a buyer
     useEffect(() => {
         if (isBuyer) {

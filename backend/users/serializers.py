@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+
+from books.serializers import BookSerializer
 from .models import Order, OrderItem,Cart, CartItem,Preference
 
 
@@ -33,23 +35,26 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     book_title = serializers.CharField(source='book.title', read_only=True)
-
+    book = BookSerializer(read_only=True)  # Use the nested serializer for the book field
+    
     class Meta:
         model = OrderItem
         fields = ['id', 'book', 'book_title', 'quantity', 'book_price', 'created_at']
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    items = OrderItemSerializer(many=True, read_only=True)
-    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    items = OrderItemSerializer(many=True, read_only=True)  
+    # status_display = serializers.CharField(source='get_status_display', read_only=True)
+    user = CustomUserSerializer(read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'address', 'phone_number', 'payment_method', 'status', 'status_display', 'created_at', 'items']
+        fields = ['id', 'user', 'address', 'phone_number', 'payment_method', 'status', 'created_at', 'items']
 
 
 
 class CartItemSerializer(serializers.ModelSerializer):
+    book = BookSerializer(read_only=True)  # Use the nested serializer for the book field
     book_title = serializers.CharField(source='book.title', read_only=True)
     sub_total = serializers.SerializerMethodField()
 
@@ -63,16 +68,20 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
-    total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    total_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Cart
         fields = ['id', 'user', 'total_price', 'items']
 
+    def get_total_price(self, obj):
+        # Calculate the total price as the sum of sub_total for all items in the cart
+        return sum(item.sub_total() for item in obj.items.all())
+
 
 class PreferenceSerializer(serializers.ModelSerializer):
     book_title = serializers.CharField(source='book.title', read_only=True)
-
+    
     class Meta:
         model = Preference
         fields = ['id', 'user', 'book', 'book_title', 'preference']

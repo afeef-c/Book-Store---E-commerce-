@@ -5,9 +5,9 @@ import api from '../services/api'; // Ensure this points to your Axios instance
 // Thunks for asynchronous operations
 
 // Fetch Cart
-export const fetchCart = createAsyncThunk('cart/fetchCart', async (userId, { rejectWithValue }) => {
+export const fetchCart = createAsyncThunk('cart/fetchCart', async (name, { rejectWithValue }) => {
     try {
-        const response = await api.get(`/api/users/cart/${userId}/`);
+        const response = await api.get(`/api/users/cart/?name=${encodeURIComponent(name)}`);
         return response.data;
     } catch (error) {
         toast.error('Failed to fetch cart!');
@@ -15,10 +15,14 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (userId, { rej
     }
 });
 
+
 // Add Cart Item
 export const addCartItem = createAsyncThunk('cart/addCartItem', async ({ bookId, quantity }, { rejectWithValue }) => {
     try {
-        const response = await api.post(`/api/users/cart`, { book: bookId, quantity });
+        console.log("bookId, quantity slice: ", bookId, quantity);
+
+        // Fix: Send the correct key "book" instead of "bookId"
+        const response = await api.post('api/users/cart/', {bookId, quantity });
         toast.success('Item added to cart successfully!');
         return response.data;
     } catch (error) {
@@ -39,6 +43,17 @@ export const placeOrder = createAsyncThunk('order/placeOrder', async (orderData,
     }
 });
 
+// Fetch Orders
+export const fetchOrders = createAsyncThunk('order/fetchOrders', async (_, { rejectWithValue }) => {
+    try {
+        const response = await api.get(`/api/users/orders/`);
+        return response.data;
+    } catch (error) {
+        toast.error('Failed to fetch order details!');
+        return rejectWithValue(error.response ? error.response.data : error.message);
+    }
+});
+
 // Fetch Preferences
 export const fetchPreferences = createAsyncThunk('preferences/fetchPreferences', async (_, { rejectWithValue }) => {
     try {
@@ -53,7 +68,8 @@ export const fetchPreferences = createAsyncThunk('preferences/fetchPreferences',
 // Update or Create Preference
 export const updatePreference = createAsyncThunk('preferences/updatePreference', async ({ userId, bookId, preference }, { rejectWithValue }) => {
     try {
-        const response = await api.post(`/api/users/preferences/`, { user: userId, book: bookId, preference });
+        
+        const response = await api.post(`/api/users/preferences/`, { userId, bookId, preference });
         toast.success('Preference updated successfully!');
         return response.data;
     } catch (error) {
@@ -94,6 +110,8 @@ const ecommerceSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.payload;
             })
+
+
             // Add Cart Item
             .addCase(addCartItem.pending, (state) => {
                 state.status = 'loading';
@@ -116,6 +134,21 @@ const ecommerceSlice = createSlice({
             .addCase(placeOrder.rejected, (state, action) => {
                 state.error = action.payload;
             })
+
+            // Fetch Order
+            .addCase(fetchOrders.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchOrders.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.orders = action.payload;
+            })
+            .addCase(fetchOrders.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+            
+
             // Fetch Preferences
             .addCase(fetchPreferences.pending, (state) => {
                 state.status = 'loading';

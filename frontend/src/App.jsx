@@ -9,6 +9,9 @@ import BookList from './components/BookList';
 import AddBook from './components/AddBook';
 import AddGenre from './components/AddGenre';
 import BookDetails from './pages/BookDetails';
+import Cart from './pages/Cart';
+import CheckOut from './pages/CheckOut';
+import Profile from './pages/Profile';
 
 
 function App() {
@@ -26,7 +29,10 @@ function App() {
         <Route path="/book_details/:bookId" element={<BookDetails />} />
         <Route path='/add_book' element={ <AddBook/> } />
         <Route path="/edit_book/:bookId" element={<AddBook />} />
-
+        <Route path="/cart/" element={<Cart />} />
+        <Route path="/checkout/" element={<CheckOut />} />
+        <Route path="/profile/" element={<Profile />} />
+        
         <Route path='/add_genre' element={ <AddGenre/> } />
         
 

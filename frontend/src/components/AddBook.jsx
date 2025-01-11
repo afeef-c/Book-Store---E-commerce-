@@ -158,22 +158,22 @@ function AddBook() {
                             />
                         </div>
                         <div className="form-group">
-    <label>Book Genre</label>
-    <select
-        className="form-control"
-        name="genre"
-        value={formData.genre} // Set to the current genre ID
-        onChange={handleInputChange}
-        required
-    >
-        {formData.genre === '' && <option value="">Select a genre</option>} {/* Show only when no genre is selected */}
-        {genre.map(gen => (
-            <option key={gen.id} value={gen.id}>
-                {gen.name}
-            </option>
-        ))}
-    </select>
-</div>
+                            <label>Book Genre</label>
+                            <select
+                                className="form-control"
+                                name="genre"
+                                value={formData.genre} // Set to the current genre ID
+                                onChange={handleInputChange}
+                                required
+                            >
+                                {formData.genre === '' && <option value="">Select a genre</option>} {/* Show only when no genre is selected */}
+                                {genre.map(gen => (
+                                    <option key={gen.id} value={gen.id}>
+                                        {gen.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
 
                         <div className="form-group">
