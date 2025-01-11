@@ -12,6 +12,7 @@ import BookDetails from './pages/BookDetails';
 import Cart from './pages/Cart';
 import CheckOut from './pages/CheckOut';
 import Profile from './pages/Profile';
+import SearchResults from './components/SearchResult';
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
         <Route path="/cart/" element={<Cart />} />
         <Route path="/checkout/" element={<CheckOut />} />
         <Route path="/profile/" element={<Profile />} />
+        <Route path="/search" element={<SearchResults />} />
         
         <Route path='/add_genre' element={ <AddGenre/> } />
         

@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {  fetchBooks } from '../features/bookSlice';
+import Recomendations from '../components/Recomendations';
 
 function Home() {
   const dispatch = useDispatch();
-  const { book_list , status, error } = useSelector((state) => state.books.book_list);
-  const newBooks= book_list
-  const mostLikedBooks= book_list
   
   useEffect(() => {
     dispatch(fetchBooks())
@@ -37,63 +35,8 @@ function Home() {
         </div>
       </div>
 
-      {/* Newly Added Books */}
-      <div className="new-books container my-5">
-        <h2 className="text-center mb-4">Newly Added Books</h2>
-        {status === 'loading' ? (
-          <p>Loading...</p>
-        ) : error ? (
-          <p className="text-danger">{error}</p>
-        ) : (
-          <div className="row">
-            {newBooks?.map((book) => (
-              <div className="col-md-3 mb-4" key={book.id}>
-                <div className="card h-100">
-                  <img
-                    src={book.coverImage || 'https://via.placeholder.com/150'}
-                    alt={book.title}
-                    className="card-img-top"
-                    style={{ height: '200px', objectFit: 'cover' }}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title">{book.title}</h5>
-                    <p className="card-text">{book.author}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <Recomendations/>
 
-      {/* Most Liked Books */}
-      <div className="most-liked-books container my-5">
-        <h2 className="text-center mb-4">Most Liked Books</h2>
-        {status === 'loading' ? (
-          <p>Loading...</p>
-        ) : error ? (
-          <p className="text-danger">{error}</p>
-        ) : (
-          <div className="row">
-            {mostLikedBooks?.map((book) => (
-              <div className="col-md-3 mb-4" key={book.id}>
-                <div className="card h-100">
-                  <img
-                    src={book.coverImage || 'https://via.placeholder.com/150'}
-                    alt={book.title}
-                    className="card-img-top"
-                    style={{ height: '200px', objectFit: 'cover' }}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title">{book.title}</h5>
-                    <p className="card-text">{book.author}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 }

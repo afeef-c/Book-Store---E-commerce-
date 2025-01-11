@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { addCartItem, fetchCart, fetchPreferences } from '../features/ecommerceSlice';
 import { fetchBookDetails, fetchBooks, fetchGenre } from '../features/bookSlice';
 import PreferenceButtons from '../components/PreferenceButtons';
@@ -14,7 +14,7 @@ function BookDetails() {
     const { bookDetails, books_status, details_status } = useSelector((state) => state.books);
     const genre = useSelector((state) => state.books.genre);
     const preferences = useSelector((state) => state.ecommerce.preferences);
-
+    const navigate = useNavigate()
     const [isAdmin, setIsAdmin] = useState(false);
     const [isBuyer, setIsBuyer] = useState(false);
 
@@ -30,11 +30,17 @@ function BookDetails() {
         }
     };
 
-    const addToCart = ()=>{
-        console.log("bookDetails.id, quantity",bookDetails.id, quantity)
-        dispatch(addCartItem({bookId:bookDetails.id, quantity}))
+    const addToCart = async()=>{
+
+        try {
+            await dispatch(addCartItem({bookId:bookDetails.id, quantity})).unwrap(); // Dispatch the action and wait for it to complete
+            navigate('/cart'); // Redirect to the cart page
+        } catch (error) {
+            console.error('Failed to add item to cart!',error);
+        }
         // dispatch(fetchCart(user.username))
     }
+    
 
     // Fetch data on initial render
     useEffect(() => {

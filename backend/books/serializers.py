@@ -13,8 +13,8 @@ class BookGenreSerializer(serializers.ModelSerializer):
 
 
 class BookSerializer(serializers.ModelSerializer):
-    genre = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all())  # Make genre accept IDs
-
+    # genre = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all())  # Make genre accept IDs
+    genre = BookGenreSerializer()
     class Meta:
         model = Book
         fields = '__all__'

@@ -58,7 +58,7 @@ function BookList() {
       if (isBuyer){
         dispatch(fetchPreferences())
       }
-    },[dispatch, isBuyer, user.id])
+    },[dispatch, isBuyer, user])
     
     console.log('preferences: ',preferences)
 

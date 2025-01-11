@@ -24,6 +24,7 @@ export const addCartItem = createAsyncThunk('cart/addCartItem', async ({ bookId,
         // Fix: Send the correct key "book" instead of "bookId"
         const response = await api.post('api/users/cart/', {bookId, quantity });
         toast.success('Item added to cart successfully!');
+        
         return response.data;
     } catch (error) {
         toast.error('Failed to add item to cart!');

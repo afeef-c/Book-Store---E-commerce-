@@ -63,46 +63,6 @@ class CurrentUserView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-class CartRetrieveCreateView(RetrieveAPIView, CreateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = CartSerializer
-
-    def get_object(self):
-        cart, _ = Cart.objects.get_or_create(user=self.request.user)
-
-        try:
-            cart = Cart.objects.get(user=self.request.user)
-            return cart
-        except Cart.DoesNotExist:
-            raise Http404("Cart not found for this user.")
-        
-    def post(self, request, *args, **kwargs):
-        cart, _ = Cart.objects.get_or_create(user=request.user)
-        book_id = request.data.get('book')
-        quantity = request.data.get('quantity', 1)
-
-        try:
-            book = Book.objects.get(id=book_id)
-        except Book.DoesNotExist:
-            return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        cart_item, created = CartItem.objects.get_or_create(
-            cart=cart,
-            book=book,
-            defaults={'quantity': quantity, 'price_at_addition': book.price}
-        )
-
-        if not created:
-            cart_item.quantity += int(quantity)
-            cart_item.save()
-
-        # Recalculate total price
-        cart.total_price = sum(item.sub_total() for item in cart.items.all())
-        cart.save()
-
-        serializer = self.get_serializer(cart)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 
 class CartView(APIView):
     permission_classes = [IsAuthenticated]
@@ -141,11 +101,11 @@ class CartView(APIView):
 
 
 
-
 class CartItemDeleteView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, item_id):
+        print("Deletion: ", request.user, item_id)
         try:
             cart_item = CartItem.objects.get(id=item_id, cart__user=request.user)
             cart_item.delete()

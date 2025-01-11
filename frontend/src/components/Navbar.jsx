@@ -4,6 +4,7 @@ import { useNavigate,NavLink } from "react-router-dom";
 import { fetchUserDetails, logoutUser } from "../features/authSlice";
 import { toast } from "react-toastify";
 import CartIcon from "./CartIcon";
+import SearchForm from "./SearchForm";
 
 function Navbar() {
   const dispatch = useDispatch();
@@ -34,6 +35,8 @@ function Navbar() {
           }
       }
   }, [user]);
+
+  
 
 
   return (
@@ -79,17 +82,8 @@ function Navbar() {
               {isBuyer && <CartIcon />}
             </li>
             <li className="nav-item">
-              <form className="d-flex">
-                <input
-                  className="form-control me-2"
-                  type="search"
-                  placeholder="Search"
-                  aria-label="Search"
-                />
-                <button className="btn btn-outline-success" type="submit">
-                  Search
-                </button>
-              </form>
+              
+              <SearchForm/>
             </li>
 
             {user && (
@@ -111,9 +105,7 @@ function Navbar() {
                     </NavLink>
                   </li>
                   <li>
-                    <a className="dropdown-item" href="#">
-                      Another Action
-                    </a>
+                    
                   </li>
                   <li>
                     <hr className="dropdown-divider" />
