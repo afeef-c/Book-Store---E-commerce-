@@ -4,7 +4,7 @@ from rest_framework import status
 
 from users.models import Preference
 from .models import Book,Genre
-from .serializers import BookSerializer,BookGenreSerializer
+from .serializers import BookSerializer,BookGenreSerializer,BookSerializerWrite
 from rest_framework import generics, permissions
 import logging
 from django.db.models import Q
@@ -40,8 +40,8 @@ class BookListCreateView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-
-        serializer = BookSerializer(data=request.data)
+        print("data: ",request.data)
+        serializer = BookSerializerWrite(data=request.data)
         if serializer.is_valid():
             print("Serialization valid")
             serializer.save()

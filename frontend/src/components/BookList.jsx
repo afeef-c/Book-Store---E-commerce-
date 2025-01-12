@@ -100,7 +100,7 @@ function BookList() {
                             <div className="card h-100">
                                 <img
                                     // src={book.book_image||'https://images.theconversation.com/files/45159/original/rptgtpxd-1396254731.jpg?ixlib=rb-4.1.0&q=45&auto=format&w=754&fit=clip'}
-                                    src={`${import.meta.env.VITE_API_URL}${book.book_image}` || 'https://images.theconversation.com/files/45159/original/rptgtpxd-1396254731.jpg?ixlib=rb-4.1.0&q=45&auto=format&w=754&fit=clip'}
+                                    src={book.book_image || 'https://images.theconversation.com/files/45159/original/rptgtpxd-1396254731.jpg?ixlib=rb-4.1.0&q=45&auto=format&w=754&fit=clip'}
 
                                     className="card-img-top"
                                     alt={book.title}

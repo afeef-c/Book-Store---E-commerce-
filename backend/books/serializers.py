@@ -19,6 +19,17 @@ class BookSerializer(serializers.ModelSerializer):
         model = Book
         fields = '__all__'
 
+class BookSerializerWrite(serializers.ModelSerializer):
+    genre = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all())  # Make genre accept IDs
+    
+    class Meta:
+        model = Book
+        fields = '__all__'
+        
+    def create(self, validated_data):
+        # Ensure the default storage is used
+        return Book.objects.create(**validated_data)
+
     # def update(self, instance, validated_data):
     #     request = self.context.get('request')
     #     user = request.user

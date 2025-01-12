@@ -86,7 +86,7 @@ function Navbar() {
               <SearchForm/>
             </li>
 
-            {user && (
+            {user ? (
               <li className="nav-item dropdown">
                 <a
                   className="nav-link dropdown-toggle"
@@ -116,6 +116,12 @@ function Navbar() {
                     </button>
                   </li>
                 </ul>
+              </li>
+            ):(
+              <li className="nav-item">
+                <NavLink className="nav-link" to={'/login'}>
+                  Login
+                </NavLink>
               </li>
             )}
           </ul>
