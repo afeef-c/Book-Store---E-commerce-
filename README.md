@@ -37,7 +37,7 @@ You can access the live version of the project here: [Live Demo](https://book-st
 ## Tech Stack
 
 - **Backend**: Django (Python)
-- **Frontend**: React.js
+- **Frontend**: React.js (Styling uisng Bostrap5)
 - **State Management**: Redux Toolkit
 - **Database**: PostgreSQL
 - **Cloud Storage**: AWS S3 (for storing book images)
