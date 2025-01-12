@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import AuthListener from './components/Auth/AuthListener';
 import Home from './pages/Home';
 import Login from './components/Auth/Login';
@@ -10,9 +10,9 @@ import AddBook from './components/AddBook';
 import AddGenre from './components/AddGenre';
 import BookDetails from './pages/BookDetails';
 import Cart from './pages/Cart';
-import CheckOut from './pages/CheckOut';
 import Profile from './pages/Profile';
 import SearchResults from './components/SearchResult';
+import Checkout from './pages/CheckOut';
 
 
 function App() {
@@ -31,7 +31,7 @@ function App() {
         <Route path='/add_book' element={ <AddBook/> } />
         <Route path="/edit_book/:bookId" element={<AddBook />} />
         <Route path="/cart/" element={<Cart />} />
-        <Route path="/checkout/" element={<CheckOut />} />
+        <Route path="/checkout/" element={<Checkout />} />
         <Route path="/profile/" element={<Profile />} />
         <Route path="/search" element={<SearchResults />} />
         

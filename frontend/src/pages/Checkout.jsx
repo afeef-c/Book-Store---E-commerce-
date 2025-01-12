@@ -6,7 +6,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import api from "../services/api";
 
-function CheckOut() {
+function Checkout() {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.ecommerce.cart);
   const user = useSelector((state) => state.auth.user);
@@ -171,4 +171,4 @@ function CheckOut() {
   );
 }
 
-export default CheckOut;
+export default Checkout;
