@@ -59,10 +59,12 @@ ROOT_URLCONF = 'backend.urls'
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # React dev server
+    'https://book-store-e-commerce.onrender.com'
     
 ]
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",  # Frontend URL
+    "http://localhost:5173",
+    "https://book-store-e-commerce.onrender.com"    # Frontend URL
 ]
 
 TEMPLATES = [
