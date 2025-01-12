@@ -35,7 +35,7 @@ class GenreListCreateView(generics.ListCreateAPIView):
 class BookListCreateView(APIView):
     
     def get(self, request):
-        books = Book.objects.all()
+        books = Book.objects.all().order_by('-added_date')
         serializer = BookSerializer(books, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -73,9 +73,10 @@ class BookDetailView(APIView):
     def put(self, request, pk):
         logger.debug(f"Request data: {request.data}")
         book = self.get_object(pk)
+        print(book, request.data)
         if not book:
             return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = BookSerializer(book, data=request.data)
+        serializer = BookSerializerWrite(book, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -98,7 +99,11 @@ class BookSearchView(APIView):
         print("Check query: ",request, query)
         if not query:
             return Response({"error": "Query parameter 'q' is required."}, status=status.HTTP_400_BAD_REQUEST)
-        books = Book.objects.filter(title__icontains=query)  # Search by title
+        books = Book.objects.filter(
+            Q(title__icontains=query) | 
+            Q(description__icontains=query) | 
+            Q(genre__name__icontains=query) | 
+            Q(author__icontains=query))  
         serializer = BookSerializer(books, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

@@ -39,7 +39,7 @@ function AddGenre() {
             setError(error.response ? error.response.data : 'Error creating category');
         } finally {
             setLoading(false);
-            navigate('/')
+            navigate('/add_book')
         }
     };
 

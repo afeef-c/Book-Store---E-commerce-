@@ -18,9 +18,3 @@ class Book(models.Model):
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     added_date = models.DateTimeField(auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        print("Default storage location:", default_storage)
-        print("Cover image name:", self.book_image.name)
-        print("Is default storage S3?:", isinstance(default_storage, S3Boto3Storage))
-        super().save(*args, **kwargs)

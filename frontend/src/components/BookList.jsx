@@ -19,18 +19,8 @@ function BookList() {
     const genre_error = useSelector((state) => state.books.gen_error);
     const preferences = useSelector((state) => state.ecommerce.preferences);
     
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [isAdmin, setIsAdmin] = useState(false)
-    const [isBuyer , setIsBuyer ] = useState(false)
-
-    // const handleLike = () => {
-    //   setLikes((prevLikes) => prevLikes + 1);
-    // };
-
-    // const handleDislike = () => {
-    //   setDislikes((prevDislikes) => prevDislikes + 1);
-    // };
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isBuyer, setIsBuyer] = useState(false);
 
     useEffect(() => {
         if (books_status === "idle") {
@@ -39,113 +29,83 @@ function BookList() {
         if (genre_status === "idle") {
             dispatch(fetchGenre());
         }
-        
     }, [dispatch, books_status, genre_status]);
 
-    useEffect(()=>{
-      if (user){
-        if (user.is_staff){
-          setIsAdmin(true)
+    useEffect(() => {
+        if (user) {
+            setIsAdmin(user.is_staff);
+            setIsBuyer(!user.is_staff);
         }
-        else{
-          setIsBuyer(true)
+    }, [user]);
+
+    useEffect(() => {
+        if (isBuyer) {
+            dispatch(fetchPreferences());
         }
-      }
-
-    },[user])
-
-    useEffect(()=>{
-      if (isBuyer){
-        dispatch(fetchPreferences())
-      }
-    },[dispatch, isBuyer, user])
-    
-    console.log('preferences: ',preferences)
-
+    }, [dispatch, isBuyer]);
 
     const deleteBook = async (bookId) => {
-      try {
-          await api.delete(`/api/books/book_details/${bookId}/`, {
-              headers: {
-                  Authorization: `Bearer ${authTokens.access}`,
-              },
-          });
-          toast.success('Book deleted successfully');
-          dispatch(fetchBooks())
-      } catch (error) {
-          console.error('Error deleting book:', error.response ? error.response.data : error);
-          toast.error('Failed to delete book');
-      }
-  };
-  
+        try {
+            await api.delete(`/api/books/book_details/${bookId}/`, {
+                headers: {
+                    Authorization: `Bearer ${authTokens.access}`,
+                },
+            });
+            toast.success("Book deleted successfully");
+            dispatch(fetchBooks());
+        } catch (error) {
+            toast.error("Failed to delete book");
+        }
+    };
 
     return (
-        <div className="container mt-4">
-            <h2 className="mb-4">Books Collection</h2>
-
+        <div className="container mt-5">
+            <h2 className="text-center mb-4">📚 Explore Our Book Collection</h2>
             {books_status === "loading" || genre_status === "loading" ? (
-                <div className="text-center">
+                <div className="d-flex justify-content-center align-items-center" style={{ height: "50vh" }}>
                     <div className="spinner-border text-primary" role="status">
                         <span className="visually-hidden">Loading...</span>
                     </div>
                 </div>
             ) : books_error || genre_error ? (
-                <div className="alert alert-danger">
+                <div className="alert alert-danger text-center">
                     {books_error || genre_error}
                 </div>
-            ) : (
-                (book_list.lenght)>0 ?
-                (<div className="row">
+            ) : book_list.length > 0 ? (
+                <div className="row g-4">
                     {book_list.map((book) => (
-                        <div className="col-md-4 mb-4" key={book.id}>
-                            <div className="card h-100">
+                        <div className="col-md-4 col-sm-6" key={book.id}>
+                            <div className="card h-100 shadow-sm border-0">
                                 <img
-                                    // src={book.book_image||'https://images.theconversation.com/files/45159/original/rptgtpxd-1396254731.jpg?ixlib=rb-4.1.0&q=45&auto=format&w=754&fit=clip'}
-                                    src={book.book_image || 'https://images.theconversation.com/files/45159/original/rptgtpxd-1396254731.jpg?ixlib=rb-4.1.0&q=45&auto=format&w=754&fit=clip'}
-
+                                    src={book.book_image || "https://via.placeholder.com/300x200?text=No+Image"}
                                     className="card-img-top"
                                     alt={book.title}
-                                    style={{ height: "200px", objectFit: "cover" }}
+                                    style={{ height: "250px", objectFit: "cover" }}
                                 />
                                 <div className="card-body">
-                                    <h5 className="card-title">{book.title}</h5>
-                                    <p className="card-text">
-                                        Author: {book.author}
-                                    </p>
-                                    <p className="card-text">
-                                        Genre: {book.genre?.name||  "Unknown"}
-                                    </p>
-                                    <p className="card-text text-success fw-bold">
-                                        Price: ₹{book.price}
-                                    </p>
+                                    <h5 className="card-title text-primary">{book.title}</h5>
+                                    <p className="card-text">Author: {book.author}</p>
+                                    <p className="card-text">Genre: {book.genre?.name || "Unknown"}</p>
+                                    <p className="card-text text-success fw-bold">Price: ₹{book.price}</p>
                                 </div>
-                                <NavLink to={`/book_details/${book.id}`} className="btn btn-primary ">
-                                  Details
-                                </NavLink>
-                                {isAdmin?
-                                (<div>
-                                <NavLink to={`/edit_book/${book.id}`} className="btn btn-primary ">
-                                  Edit
-                                </NavLink>
-                                <button onClick={()=>deleteBook(book.id)} className="btn btn-danger">
-                                  Delete
-                                </button>
-                                
-                                </div>):
-                                (<div className="card-footer text-center">
-                                    
-                                    <PreferenceButtons bookId={book.id}/>
-                                </div>)
-                                }
+                                <div className="d-flex justify-content-around mb-3">
+                                    <NavLink to={`/book_details/${book.id}`} className="btn btn-outline-primary btn-sm">Details</NavLink>
+                                    {isAdmin && (
+                                        <>
+                                            <NavLink to={`/edit_book/${book.id}`} className="btn btn-outline-warning btn-sm">Edit</NavLink>
+                                            <button onClick={() => deleteBook(book.id)} className="btn btn-outline-danger btn-sm">Delete</button>
+                                        </>
+                                    )}
+                                    {isBuyer && <PreferenceButtons bookId={book.id} />}
+                                </div>
                             </div>
                         </div>
                     ))}
-                </div>):
-                (
-                    <div className="alert alert-warning">
-                        Books not found found.
-                    </div>
-                  )
+                </div>
+            ) : (
+                <div className="alert alert-info text-center">
+                    No books available at the moment. Please check back later!
+                </div>
             )}
         </div>
     );

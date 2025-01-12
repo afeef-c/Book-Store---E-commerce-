@@ -59,7 +59,7 @@ class Order(models.Model):
     address = models.TextField()
     phone_number = models.CharField(max_length=15)
     payment_method = models.CharField(max_length=50, default="COD")
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='placed')
     created_at = models.DateTimeField(auto_now_add=True)
     
 
