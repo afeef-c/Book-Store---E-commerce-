@@ -76,7 +76,9 @@ function Recomendations() {
         </div>
         
       ) : (
+        <div className="alert alert-warning">
         <p className='text-warning'>No recommendations for you.</p>
+        </div>
       )}
     </div>
     </>

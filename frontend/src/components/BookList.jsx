@@ -94,7 +94,8 @@ function BookList() {
                     {books_error || genre_error}
                 </div>
             ) : (
-                <div className="row">
+                (book_list.lenght)>0 ?
+                (<div className="row">
                     {book_list.map((book) => (
                         <div className="col-md-4 mb-4" key={book.id}>
                             <div className="card h-100">
@@ -139,7 +140,12 @@ function BookList() {
                             </div>
                         </div>
                     ))}
-                </div>
+                </div>):
+                (
+                    <div className="alert alert-warning">
+                        Books not found found.
+                    </div>
+                  )
             )}
         </div>
     );
