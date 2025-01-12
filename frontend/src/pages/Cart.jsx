@@ -84,7 +84,7 @@ function Cart() {
                             <td>{item?.book?.title}</td>
                             <td>
                             <img
-                                src={`${import.meta.env.VITE_API_URL}${item?.book?.book_image}`} // Assuming this is the correct field for the image URL
+                                src={item?.book?.book_image || 'https://images.theconversation.com/files/45159/original/rptgtpxd-1396254731.jpg?ixlib=rb-4.1.0&q=45&auto=format&w=754&fit=clip'} // Assuming this is the correct field for the image URL
                                 alt={item.book.title}
                                 className="img-thumbnail"
                                 style={{ width: "60px", height: "80px", objectFit: "cover" }}

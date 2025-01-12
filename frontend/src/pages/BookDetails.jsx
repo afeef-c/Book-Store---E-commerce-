@@ -90,7 +90,7 @@ function BookDetails() {
             <div className="row">
                 <div className="col-md-6">
                     <img
-                        src={`${import.meta.env.VITE_API_URL}${bookDetails.book_image}` || 'https://images.theconversation.com/files/45159/original/rptgtpxd-1396254731.jpg?ixlib=rb-4.1.0&q=45&auto=format&w=754&fit=clip'}
+                        src={bookDetails.book_image || 'https://images.theconversation.com/files/45159/original/rptgtpxd-1396254731.jpg?ixlib=rb-4.1.0&q=45&auto=format&w=754&fit=clip'}
                         alt={bookDetails.title}
                         className="img-fluid rounded shadow-sm"
                     />
