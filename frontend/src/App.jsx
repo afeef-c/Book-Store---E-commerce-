@@ -12,7 +12,7 @@ import BookDetails from './pages/BookDetails';
 import Cart from './pages/Cart';
 import Profile from './pages/Profile';
 import SearchResults from './components/SearchResult';
-import Checkout from './pages/CheckOut';
+import Checkout from './pages/Checkout';
 
 
 function App() {
