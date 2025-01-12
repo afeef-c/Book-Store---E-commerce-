@@ -2,6 +2,11 @@
 
 This is a full-stack Book Selling (Book store) Application that mimics a simplified version of Flipkart with user preferences, book recommendations, and a streamlined e-commerce workflow. The application includes features such as dynamic recommendations, shopping cart functionality, and order tracking.
 
+## Live Demo
+
+You can access the live version of the project here: [Live Demo](https://book-store-e-commerce.onrender.com)
+
+
 ## Features Implemented
 
 ### 1. **User Preferences**
@@ -57,4 +62,3 @@ git clone https://github.com/afeef-c/Book-Store---E-commerce-.git
 cd Book-Store---E-commerce-
 
 
-Live Application Link: https://book-store-e-commerce.onrender.com
